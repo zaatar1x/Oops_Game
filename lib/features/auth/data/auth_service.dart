@@ -60,6 +60,30 @@ class AuthService {
     return Profile.fromJson(data);
   }
 
+  // UPDATE PROFILE AFTER QUIZ
+  Future<void> updateProfileAfterQuiz({required int scoreEarned}) async {
+    final user = supabase.auth.currentUser;
+    if (user == null) throw Exception('No authenticated user');
+
+    // Get current profile data
+    final currentProfile = await getProfile();
+    if (currentProfile == null) throw Exception('Profile not found');
+
+    // Calculate new values
+    final newXP = currentProfile.xp + scoreEarned;
+    final newGamesPlayed = currentProfile.gamesPlayed + 1;
+    final newStreak = currentProfile.streak + 1;
+    final newLevel = (newXP / 1000).floor() + 1;
+
+    // Update profile in database
+    await supabase.from('profiles').update({
+      'xp': newXP,
+      'games_played': newGamesPlayed,
+      'streak': newStreak,
+      'level': newLevel,
+    }).eq('id', user.id);
+  }
+
   // CURRENT USER
   User? get currentUser => supabase.auth.currentUser;
 }
