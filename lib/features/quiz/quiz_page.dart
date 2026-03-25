@@ -61,7 +61,6 @@ class _QuizPageState extends ConsumerState<QuizPage> {
 
     // Wait 2 seconds to show feedback, then move to next question
     Future.delayed(const Duration(seconds: 2), () {
-      final oldStreak = ref.read(quizProvider).correctStreak;
       
       ref.read(quizProvider.notifier).answerQuestion(index);
       
