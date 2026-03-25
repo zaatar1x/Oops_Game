@@ -7,6 +7,7 @@ import '../features/auth/data/profile_model.dart';
 import '../shared/widgets/app_button.dart';
 import '../shared/widgets/app_card.dart';
 import '../shared/widgets/app_progress_bar.dart';
+import '../features/quiz/quiz_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -76,6 +77,14 @@ class _HomePageState extends State<HomePage> {
                       text: 'Play Now',
                    
                       icon: Icons.play_arrow_rounded,
+                      onPressed: () async {
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const QuizPage()),
+                        );
+                        // Reload profile after returning from quiz
+                        loadProfile();
+                      },
                     ),
                     
                     const SizedBox(height: AppSpacing.md),
