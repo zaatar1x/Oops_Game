@@ -27,7 +27,7 @@ class _RegisterPageState extends State<RegisterPage> {
     setState(() => isLoading = true);
     
     try {
-      await auth.signUp(
+      final response = await auth.signUp(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
         firstName: firstNameController.text.trim(),
@@ -35,7 +35,29 @@ class _RegisterPageState extends State<RegisterPage> {
       );
 
       if (!mounted) return;
-      Navigator.pop(context);
+      
+      // Check if email confirmation is required
+      if (response.user != null) {
+        // User created successfully, navigate back
+        Navigator.pop(context);
+        
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Account created successfully!'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+      } else {
+        // Email confirmation required
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please check your email to confirm your account'),
+            backgroundColor: AppColors.primary,
+          ),
+        );
+        Navigator.pop(context);
+      }
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
