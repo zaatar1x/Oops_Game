@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'models/question_model.dart';
 import 'services/question_generator_service.dart';
+import '../auth/data/auth_service.dart';
+import '../ranking/data/ranking_service.dart';
 
 class QuizState {
   final List<Question> questions;
@@ -9,9 +11,11 @@ class QuizState {
   final int timeLeft;
   final bool isLoading;
   final String? error;
-  final int correctStreak; // Track consecutive correct answers
+  final int correctStreak;
+  final bool isFinished;
+  final bool isProcessed; // 🔥 prevent double execution
 
-  bool get isFinished => currentIndex >= questions.length;
+  bool get isQuizCompleted => currentIndex >= questions.length;
 
   QuizState({
     this.questions = const [],
@@ -21,6 +25,8 @@ class QuizState {
     this.isLoading = false,
     this.error,
     this.correctStreak = 0,
+    this.isFinished = false,
+    this.isProcessed = false,
   });
 
   QuizState copyWith({
@@ -29,9 +35,10 @@ class QuizState {
     int? score,
     int? timeLeft,
     bool? isLoading,
-    bool? isFinished,
     String? error,
     int? correctStreak,
+    bool? isFinished,
+    bool? isProcessed,
   }) {
     return QuizState(
       questions: questions ?? this.questions,
@@ -41,21 +48,26 @@ class QuizState {
       isLoading: isLoading ?? this.isLoading,
       error: error,
       correctStreak: correctStreak ?? this.correctStreak,
+      isFinished: isFinished ?? this.isFinished,
+      isProcessed: isProcessed ?? this.isProcessed,
     );
   }
 }
 
 class QuizNotifier extends Notifier<QuizState> {
   final quizService = QuizService();
+  final authService = AuthService();
+  final rankingService = RankingService();
 
   @override
   QuizState build() {
     return QuizState();
   }
 
+  // 🚀 START QUIZ
   Future<void> startQuiz() async {
     try {
-      state = state.copyWith(isLoading: true, isFinished: false);
+      state = state.copyWith(isLoading: true);
 
       final questions = await quizService.fetchQuestions();
 
@@ -65,8 +77,9 @@ class QuizNotifier extends Notifier<QuizState> {
         currentIndex: 0,
         score: 0,
         timeLeft: 180,
-        isFinished: false,
         correctStreak: 0,
+        isFinished: false,
+        isProcessed: false,
       );
     } catch (e) {
       state = state.copyWith(
@@ -76,7 +89,8 @@ class QuizNotifier extends Notifier<QuizState> {
     }
   }
 
-  void answerQuestion(int selectedIndex) {
+  // 🎯 ANSWER QUESTION
+  Future<void> answerQuestion(int selectedIndex) async {
     if (state.isFinished) return;
 
     final currentQuestion = state.questions[state.currentIndex];
@@ -86,58 +100,86 @@ class QuizNotifier extends Notifier<QuizState> {
     int newStreak = state.correctStreak;
 
     if (isCorrect) {
-      // Add base points for correct answer
       newScore += 10;
-      
-      // Increment streak
       newStreak += 1;
-      
-      // Award streak bonus every 3 correct answers in a row
+
       if (newStreak % 3 == 0) {
-        newScore += 10; // +10 streak bonus
+        newScore += 10;
       }
     } else {
-      // Reset streak on wrong answer
       newStreak = 0;
     }
 
-    // Always increment currentIndex to move forward
     final newIndex = state.currentIndex + 1;
-    
-    // Check if quiz is finished after incrementing
     final finished = newIndex >= state.questions.length;
 
-    // If finished before time runs out, add time bonus
     if (finished && state.timeLeft > 0) {
-      newScore += 20; // +20 bonus for finishing before time
+      newScore += 20;
     }
 
     state = state.copyWith(
       score: newScore,
       currentIndex: newIndex,
-      isFinished: finished,
       correctStreak: newStreak,
+      isFinished: finished,
     );
-  }
 
-  void decreaseTime() {
-    if (state.timeLeft > 0) {
-      state = state.copyWith(timeLeft: state.timeLeft - 1);
-    } else {
-      // Time's up! End quiz with 0 score
-      state = state.copyWith(
-        isFinished: true,
-        score: 0, // Reset score to 0 when time runs out
-        currentIndex: state.questions.length, // Move to end to show completion screen
-      );
+    if (finished) {
+      await _handleQuizEnd(newScore);
     }
   }
 
+  // ⏱️ TIMER
+  Future<void> decreaseTime() async {
+    if (state.timeLeft > 0) {
+      state = state.copyWith(timeLeft: state.timeLeft - 1);
+    } else {
+      if (state.isFinished) return;
+
+      state = state.copyWith(
+        isFinished: true,
+        score: 0,
+        currentIndex: state.questions.length,
+      );
+
+      await _handleQuizEnd(0);
+    }
+  }
+
+  // 🔥 HANDLE END OF QUIZ (SAFE VERSION)
+  Future<void> _handleQuizEnd(int finalScore) async {
+    // ✅ prevent double execution
+    if (state.isProcessed) return;
+
+    state = state.copyWith(isProcessed: true);
+
+    final user = authService.currentUser;
+    if (user == null) return;
+
+    try {
+      // 🔹 update profile → get NEW streak
+      final newStreak = await authService.updateProfileAfterQuiz(
+        scoreEarned: finalScore,
+      );
+
+      // 🔹 update RP
+      await rankingService.updateRP(
+        userId: user.id,
+        score: finalScore,
+        streak: newStreak,
+      );
+
+      print("✅ Quiz end processed");
+    } catch (e) {
+      print("❌ Quiz end error: $e");
+    }
+  }
+
+  // 🔄 RESET
   void resetQuiz() {
     state = QuizState();
   }
 }
 
-final quizProvider = NotifierProvider<QuizNotifier, QuizState>(() {
-  return QuizNotifier();
-});
+final quizProvider =
+    NotifierProvider<QuizNotifier, QuizState>(() => QuizNotifier());

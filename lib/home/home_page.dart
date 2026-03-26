@@ -8,6 +8,7 @@ import '../shared/widgets/app_button.dart';
 import '../shared/widgets/app_card.dart';
 import '../shared/widgets/app_progress_bar.dart';
 import '../features/quiz/quiz_page.dart';
+import '../features/ranking/presentation/leaderboard_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -227,6 +228,17 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildRankCard() {
     return AppCard(
+      onTap: () async {
+        // Navigate to leaderboard page when rank card is clicked
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LeaderboardPage(rank: profile!.rank),
+          ),
+        );
+        // Reload profile after returning from leaderboard
+        loadProfile();
+      },
       child: Column(
         children: [
           Container(
@@ -248,6 +260,14 @@ class _HomePageState extends State<HomePage> {
             style: AppTextStyles.body.copyWith(
               color: AppColors.greyDark,
               fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            'Tap to view',
+            style: AppTextStyles.caption.copyWith(
+              color: AppColors.grey,
+              fontSize: 10,
             ),
           ),
         ],
