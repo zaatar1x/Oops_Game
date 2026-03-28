@@ -3,6 +3,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../shared/widgets/app_card.dart';
+import '../../MiniGames/mini_games_menu_page.dart';
 import '../data/ranking_service.dart';
 import '../models/room_member_model.dart';
 import '../models/room_model.dart';
@@ -152,6 +153,8 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                 children: [
                   _buildRoomInfo(),
                   const SizedBox(height: AppSpacing.md),
+                  _buildMiniGamesButton(),
+                  const SizedBox(height: AppSpacing.md),
                   if (currentUserId != null && userPosition != null)
                     _buildUserPositionCard(),
                   const SizedBox(height: AppSpacing.md),
@@ -250,6 +253,58 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildMiniGamesButton() {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const MiniGamesMenuPage(),
+          ),
+        );
+      },
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(AppSpacing.md),
+        decoration: BoxDecoration(
+          gradient: AppColors.accentGradient,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.accent.withOpacity(0.3),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.games_rounded,
+              color: AppColors.white,
+              size: 28,
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            Text(
+              'Play Mini Games',
+              style: AppTextStyles.subtitle.copyWith(
+                color: AppColors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.xs),
+            const Icon(
+              Icons.arrow_forward_rounded,
+              color: AppColors.white,
+              size: 20,
+            ),
+          ],
+        ),
       ),
     );
   }
