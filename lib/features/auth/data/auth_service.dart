@@ -114,7 +114,7 @@ Future<AuthResponse> signUp({
     }
   }
 
-  // 🔥 UPDATE PROFILE AFTER QUIZ (FIXED)
+  // 🔥 UPDATE PROFILE AFTER QUIZ (FIXED) - Using RPC to bypass RLS
   Future<int> updateProfileAfterQuiz({
     required int scoreEarned,
   }) async {
@@ -122,31 +122,19 @@ Future<AuthResponse> signUp({
     if (user == null) throw Exception('No authenticated user');
 
     try {
-      final data = await supabase
-          .from('profiles')
-          .select('xp, games_played, streak')
-          .eq('id', user.id)
-          .maybeSingle();
+      // Use RPC function to bypass RLS policy
+      final result = await supabase.rpc('increment_profile_stats', params: {
+        'user_id_input': user.id,
+        'xp_gain': scoreEarned,
+      });
 
-      if (data == null) throw Exception('Profile not found');
+      if (result == null || (result is List && result.isEmpty)) {
+        throw Exception('Profile update failed - no result returned');
+      }
 
-      final currentXP = data['xp'] ?? 0;
-      final currentGames = data['games_played'] ?? 0;
-      final currentStreak = data['streak'] ?? 0;
-
-      final newStreak = currentStreak + 1;
-      final newXP = currentXP + scoreEarned;
-      final newGames = currentGames + 1;
-      final newLevel = (newXP / 1000).floor() + 1;
-
-      await supabase.from('profiles').update({
-        'xp': newXP,
-        'games_played': newGames,
-        'streak': newStreak,
-        'level': newLevel,
-      }).eq('id', user.id);
-
-      print("✅ Profile updated → XP:$newXP | Streak:$newStreak");
+      // Extract the new streak from the result
+      final resultData = result is List ? result.first : result;
+      final newStreak = resultData['new_streak'] as int;
 
       return newStreak;
     } catch (e) {
