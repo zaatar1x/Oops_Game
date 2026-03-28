@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
-import '../../shared/widgets/app_card.dart';
 import 'tetris/tetris_page.dart';
 
 class MiniGamesMenuPage extends StatelessWidget {

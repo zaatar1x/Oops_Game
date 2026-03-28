@@ -1,4 +1,3 @@
-import 'dart:async' as async_timer;
 import 'package:flame/game.dart';
 import 'board.dart';
 import 'piece.dart';

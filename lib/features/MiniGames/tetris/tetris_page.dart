@@ -3,7 +3,6 @@ import 'package:flame/game.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_text_styles.dart';
-import '../../../shared/widgets/app_button.dart';
 import 'tetris_game.dart';
 import 'tetris_service.dart';
 import 'constants.dart';
