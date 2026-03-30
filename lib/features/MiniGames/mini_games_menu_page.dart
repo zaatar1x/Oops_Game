@@ -3,7 +3,8 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
 import 'tetris/tetris_page.dart';
-
+import 'sudoku/sudoku_page.dart';
+import 'memory_game/widgets/difficulty_selector.dart';
 class MiniGamesMenuPage extends StatelessWidget {
   const MiniGamesMenuPage({super.key});
 
@@ -53,12 +54,42 @@ class MiniGamesMenuPage extends StatelessWidget {
                     ),
                     _buildGameCard(
                       context: context,
+                      title: 'Sudoku',
+                      icon: Icons.grid_4x4_rounded,
+                      gradient: AppColors.accentGradient,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const SudokuPage(),
+                          ),
+                        );
+                      },
+                    ),
+                    _buildGameCard(
+                      context: context,
+                      title: 'Memory',
+                      icon: Icons.psychology_rounded,
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF9C27B0), Color(0xFFBA68C8)],
+                      ),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const DifficultySelector(),
+                          ),
+                        );
+                      },
+                    ),
+                    _buildGameCard(
+                      context: context,
                       title: 'Coming Soon',
                       icon: Icons.lock_rounded,
                       gradient: LinearGradient(
                         colors: [
-                          AppColors.grey.withOpacity(0.5),
-                          AppColors.grey.withOpacity(0.3),
+                          AppColors.grey.withValues(alpha: 0.5),
+                          AppColors.grey.withValues(alpha: 0.3),
                         ],
                       ),
                       onTap: () {
@@ -95,7 +126,7 @@ class MiniGamesMenuPage extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withValues(alpha: 0.2),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
