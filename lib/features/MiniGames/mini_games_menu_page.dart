@@ -5,6 +5,8 @@ import '../../core/theme/app_text_styles.dart';
 import 'tetris/tetris_page.dart';
 import 'sudoku/sudoku_page.dart';
 import 'memory_game/widgets/difficulty_selector.dart';
+import 'flow_game/flow_game_complete.dart'; // NEW COMPLETE SYSTEM
+
 class MiniGamesMenuPage extends StatelessWidget {
   const MiniGamesMenuPage({super.key});
 
@@ -78,6 +80,25 @@ class MiniGamesMenuPage extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                             builder: (context) => const DifficultySelector(),
+                          ),
+                        );
+                      },
+                    ),
+                    _buildGameCard(
+                      context: context,
+                      title: 'Flow',
+                      icon: Icons.blur_on_rounded,
+                      gradient: const LinearGradient(
+                        colors: [
+                          Color(0xFF00E5FF),
+                          Color(0xFF00B0FF),
+                        ],
+                      ),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const FlowGameComplete(), // USING NEW SYSTEM
                           ),
                         );
                       },
