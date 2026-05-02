@@ -1,17 +1,41 @@
-# oops
+# 🎮 Oops
 
-A new Flutter project.
+Oops is a mini-games mobile app built with Flutter and Flame.
 
-## Getting Started
+It helps users turn short free moments into fun and productive gameplay instead of scrolling on social media.
 
-This project is a starting point for a Flutter application.
+---
 
-A few resources to get you started if this is your first Flutter project:
+## 🚀 Concept
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+- Play quick mini-games  
+- Earn points  
+- Unlock new rooms  
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Each room contains multiple games, and players must reach a required score to progress.
+
+---
+
+## 🧩 Features
+
+- Multiple mini-games  
+- Short gameplay sessions  
+- Room-based progression  
+- Simple and fast experience  
+
+---
+
+## 🛠️ Tech Stack
+
+- Flutter  
+- Flame  
+- Dart  
+
+---
+
+## ▶️ Getting Started
+
+```bash
+git clone https://github.com/zaatar1x/Oops_Game.git
+flutter pub get
+flutter run
