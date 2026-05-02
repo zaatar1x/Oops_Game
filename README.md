@@ -33,6 +33,13 @@ Each room contains multiple games, and players must reach a required score to pr
 
 ---
 
+## 👥 Contributors
+
+- [Wassim Guesmi](https://github.com/zaatar1x)  
+- [Islem Labidi](https://github.com/islemlabidi0)
+
+---
+
 ## ▶️ Getting Started
 
 ```bash
